@@ -1,31 +1,74 @@
-# video_comp
+# VideoComp
 
-TODO(b/407622896): Add a description for your new project, explain what is
-being released here, etc... Additional, the following sections are normally
-expected for all releases. Feel free to add additional sections if appropriate
-for your project.
+VideoComp provides a benchmark for evaluating fine-grained video-text
+compositionality, designed to test a model's ability to capture compositional
+and temporal coherence in multi-event videos. It introduces subtle disruptions
+to standard video-text pairs, such as "temporal reordering", "action word
+replacement", and "segment-level mismatch", enabling evaluation of models’
+alignment capabilities.
 
-## Installation
+This release includes two benchmark datasets:
 
-Write instructions for how the user should install your code. The instructions
-should ideally be valid when copy-pasted. You can combine this with the Usage
-section if there's no separate installation step.
+- ActivityNet-Comp
+- YouCook2-Comp
 
-## Usage
+These datasets extend the dense video captioning datasets (ActivityNet-Captions
+YouCook2), by generating LLM-rewritten multi-event paragraphs for both positive
+(coherent) and negative (disrupted) video-text pairs.
 
-Write example usage of your code. The instructions should ideally be valid when
-copy-pasted, and will be used by your technical reviewer to verify that your
-package functions correctly.
+For more details, see our [CVPR 2025 paper](TBD).
+
+## Dataset Format
+
+We release `.json` files for both training and validation splits. Each file
+contains a list of entries with the following fields.
+
+For the "segment-level mismatch" task, the actual input video should be trimmed
+from the `original_video` using the `query_video/start_time` and
+`query_videl/end_time`.
+
+- `key`: Unique identifier
+- `video_id`: YouTube video ID
+- `type`: Disruptuion type
+- `original_video/start_time`, `original_video/end_time`: Start/end time of the
+original video
+- `query_video/start_time`, `query_videl/end_time`: Start/end time of the query
+video (for actual train/eval)
+- `positive_text`: LLM-rewritten paragraph with chronologically ordered events
+- `negative_text`: LLM-rewritten paragraph with a targeted disruption
+- `positive_start_time`, `positive_end_time`: Start/end time for positive text
+- `negative_start_time`, `negative_end_time`: Start/end time for negative text
+- `question`: Question (for LLM evaluation)
+- `answer`: Answer (for LLM evaluation)
+
+## Downloads
+
+- [ActivityNet-Comp Train](TBD)
+- [ActivityNet-Comp Val](TBD)
+- [YouCook2-Comp Train](TBD)
+- [YouCook2-Comp Val](TBD)
+
+## Evaluation and Metrics
+
+We report binary classification accuracy. For CLIP-style models, the task
+involves comparing the similarity between the video and each of the positive and
+negative texts, and predicting which one is a better match. For generative
+models, we format the task as a binary-choice question and check whether the
+model's output matches the correct answer in the form `f"{answer}" == result` or
+`f"({answer})" == result`. The "all" metric is computed as the product of the
+individual binary accuracies for "temporal reordering", "action word
+replacement", and "segment-level mismatch".
 
 ## Citing this work
 
-Add citation details here, usually a pastable BibTeX snippet:
+If you use this dataset or benchmark in your work, please cite:
 
 ```
-@article{publicationname,
-      title={Publication Name},
-      author={Author One and Author Two and Author Three},
-      year={2025},
+@article{videocomp25,
+  title={VideoComp: Advancing Fine-Grained Compositional and Temporal Alignment in Video-Text Models},
+  author={Dahun Kim and AJ Piergiovanni and Ganesh Mallya and Anelia Angelova},
+  booktitle={CVPR},
+  year={2025}
 }
 ```
 
